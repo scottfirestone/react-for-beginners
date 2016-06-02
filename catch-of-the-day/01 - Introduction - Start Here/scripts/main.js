@@ -21,6 +21,10 @@ var App = React.createClass({
       order : {}
     }
   },
+  addToOrder : function(key) {
+    this.state.order[key] = this.state.order[key] + 1 || 1;
+    this.setState({ order : this.state.order });
+  },
   addFish : function(fish) {
     var timestamp = (new Date()).getTime();
     // update the state
@@ -34,7 +38,8 @@ var App = React.createClass({
     });
   },
   renderFish: function(key) {
-    return <Fish key={key} index={key} details={this.state.fishes[key]} />
+    return <Fish key={key} index={key} details={this.state.fishes[key]}
+      addToOrder={this.addToOrder}/>
   },
   render : function() {
     return (
@@ -58,8 +63,15 @@ var App = React.createClass({
 */
 
 var Fish = React.createClass({
+  onButtonClick : function() {
+    console.log("Going to add the fish: ", this.props.index);
+    var key = this.props.index;
+    this.props.addToOrder(key);
+  },
   render : function() {
     var details = this.props.details;
+    var isAvailable = (details.status === 'available' ? true : false);
+    var buttonText = (isAvailable ? 'Add To Order' : 'Sold Out!');
     return (
       <li className="menu-fish">
         <img src={details.image} alt={details.name} />
@@ -68,6 +80,7 @@ var Fish = React.createClass({
           <span className="price">{h.formatPrice(details.price)}</span>
         </h3>
         <p>{details.desc}</p>
+        <button disabled={!isAvailable} onClick={this.onButtonClick}>{buttonText}</button>
       </li>
     )
   }
